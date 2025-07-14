@@ -1,4 +1,4 @@
-#📚 GenAi Project – Your All-in-One Generative AI Toolkit
+📚 #GenAi Project – Your All-in-One Generative AI Toolkit
 
 A versatile AI-powered platform built using Python and Streamlit, designed to help you generate text, create images, process speech, and analyze data — all through an intuitive and interactive web app.
 
