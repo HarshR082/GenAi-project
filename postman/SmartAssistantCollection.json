@@ -1,0 +1,101 @@
+{
+  "info": {
+    "_postman_id": "12345678-abcd-ef00-1234-56789abcdef0",
+    "name": "Smart Assistant GenAI Collection",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Upload Document",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "formdata",
+          "formdata": [
+            {
+              "key": "file",
+              "type": "file",
+              "src": ""
+            }
+          ]
+        },
+        "url": {
+          "raw": "http://localhost:8000/upload",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8000",
+          "path": ["upload"]
+        }
+      }
+    },
+    {
+      "name": "Summarize Text",
+      "request": {
+        "method": "POST",
+        "header": [{"key": "Content-Type", "value": "application/json"}],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"text\": \"Paste document text here for summary\"\n}"
+        },
+        "url": {
+          "raw": "http://localhost:8000/summarize",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8000",
+          "path": ["summarize"]
+        }
+      }
+    },
+    {
+      "name": "Ask Anything",
+      "request": {
+        "method": "POST",
+        "header": [{"key": "Content-Type", "value": "application/json"}],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"question\": \"What is the objective?\"\n}"
+        },
+        "url": {
+          "raw": "http://localhost:8000/ask",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8000",
+          "path": ["ask"]
+        }
+      }
+    },
+    {
+      "name": "Generate Questions",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8000/generate_questions",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8000",
+          "path": ["generate_questions"]
+        }
+      }
+    },
+    {
+      "name": "Evaluate Answer",
+      "request": {
+        "method": "POST",
+        "header": [{"key": "Content-Type", "value": "application/json"}],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"question\": \"Paste generated question here\",\n    \"user_answer\": \"Paste your answer here\"\n}"
+        },
+        "url": {
+          "raw": "http://localhost:8000/evaluate",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8000",
+          "path": ["evaluate"]
+        }
+      }
+    }
+  ]
+}
