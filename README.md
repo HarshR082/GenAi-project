@@ -75,7 +75,7 @@ GenAi-project/
 |-----------------|-------------------------------------------|
 | Python          | Core programming language                 |
 | Streamlit       | Interactive UI framework                  |
-| OpenAI API      | Large language models                     |
+| Groq API      | Large language models                     |
 | Hugging Face    | Alternative AI models & hosting           |
 | PyPDF2          | PDF text extraction                       |
 | python-dotenv   | Secure environment variable management    |
