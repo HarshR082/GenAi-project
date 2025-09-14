@@ -1,5 +1,6 @@
 import streamlit as st
 import requests
+import re
 
 BASE_URL = "http://127.0.0.1:8000"
 
@@ -18,6 +19,7 @@ if "answers" not in st.session_state:
 if "feedbacks" not in st.session_state:
     st.session_state.feedbacks = {}
 
+# ---------------- Sidebar: Upload Document ----------------
 st.sidebar.header("1️⃣ Upload Document")
 uploaded_file = st.sidebar.file_uploader("Upload PDF or TXT", type=["pdf", "txt"])
 
@@ -38,6 +40,7 @@ if uploaded_file:
 if st.session_state.uploaded:
     st.success("✅ Document uploaded. Ready to interact!")
 
+    # ---------------- Auto-Summary ----------------
     with st.expander("📌 Auto-summary"):
         if st.button("Generate Summary", key="generate_summary"):
             with st.spinner("Generating summary..."):
@@ -55,6 +58,7 @@ if st.session_state.uploaded:
     st.divider()
     mode = st.radio("Choose Mode", ["Ask Anything", "Challenge Me"])
 
+    # ---------------- Ask Anything Mode ----------------
     if mode == "Ask Anything":
         st.subheader("🗨️ Ask Anything about the Document")
         question = st.text_input("Your Question", key="ask_question_input")
@@ -75,9 +79,11 @@ if st.session_state.uploaded:
                     except Exception as e:
                         st.error(f"❌ Error: {e}")
 
+    # ---------------- Challenge Me Mode ----------------
     elif mode == "Challenge Me":
         st.subheader("🧩 Challenge Me Mode")
 
+        # Generate questions if not already generated
         if not st.session_state.challenge_questions:
             if st.button("Generate 3 Questions", key="generate_challenge_questions"):
                 with st.spinner("Generating questions..."):
@@ -94,20 +100,28 @@ if st.session_state.uploaded:
                     except Exception as e:
                         st.error(f"❌ Error: {e}")
 
-        # Show questions and input fields
+        # Display questions, input fields, and evaluation
         for idx, question in enumerate(st.session_state.challenge_questions):
-            st.markdown(f"**Q{idx + 1}:** {question}")
+            # Remove LLM numbering like "1. ", "2. " to keep clean numbering
+            clean_question = re.sub(r"^\d+\.\s*", "", question)
+            st.markdown(f"**Q{idx + 1}:** {clean_question}")
+
+            # Input for user answer
             answer_key = f"answer_{idx}"
             st.session_state.answers.setdefault(answer_key, "")
             user_input = st.text_input("Your Answer", value=st.session_state.answers[answer_key], key=answer_key)
             st.session_state.answers[answer_key] = user_input
 
+            # Evaluate button
             eval_button_key = f"evaluate_{idx}"
             if st.button(f"Evaluate Q{idx + 1}", key=eval_button_key):
                 if user_input.strip():
                     with st.spinner("Evaluating..."):
                         try:
-                            res = requests.post(f"{BASE_URL}/evaluate", json={"question": question, "user_answer": user_input})
+                            res = requests.post(
+                                f"{BASE_URL}/evaluate",
+                                json={"question": clean_question, "user_answer": user_input}
+                            )
                             if res.status_code == 200:
                                 feedback = res.json().get("feedback", "")
                                 context = res.json().get("context_used", "")
