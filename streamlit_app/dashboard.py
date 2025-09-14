@@ -18,6 +18,7 @@ if "answers" not in st.session_state:
 if "feedbacks" not in st.session_state:
     st.session_state.feedbacks = {}
 
+# Sidebar - Upload
 st.sidebar.header("1️⃣ Upload Document")
 uploaded_file = st.sidebar.file_uploader("Upload PDF or TXT", type=["pdf", "txt"])
 
@@ -38,6 +39,7 @@ if uploaded_file:
 if st.session_state.uploaded:
     st.success("✅ Document uploaded. Ready to interact!")
 
+    # Auto-summary
     with st.expander("📌 Auto-summary"):
         if st.button("Generate Summary", key="generate_summary"):
             with st.spinner("Generating summary..."):
@@ -55,6 +57,7 @@ if st.session_state.uploaded:
     st.divider()
     mode = st.radio("Choose Mode", ["Ask Anything", "Challenge Me"])
 
+    # Ask Anything Mode
     if mode == "Ask Anything":
         st.subheader("🗨️ Ask Anything about the Document")
         question = st.text_input("Your Question", key="ask_question_input")
@@ -75,6 +78,7 @@ if st.session_state.uploaded:
                     except Exception as e:
                         st.error(f"❌ Error: {e}")
 
+    # Challenge Me Mode
     elif mode == "Challenge Me":
         st.subheader("🧩 Challenge Me Mode")
 
@@ -85,16 +89,17 @@ if st.session_state.uploaded:
                         res = requests.post(f"{BASE_URL}/generate_questions")
                         if res.status_code == 200:
                             questions_text = res.json().get("questions", "")
+                            # Filter out instructions or non-question lines
                             if isinstance(questions_text, list):
-                                questions_raw = questions_text
+                                st.session_state.challenge_questions = [
+                                    q.strip() for q in questions_text
+                                    if q.strip() and not q.strip().startswith(("Here are", "("))
+                                ]
                             else:
-                                questions_raw = questions_text.split("\n")
-
-                            # Keep only lines that look like real questions (filter out instructions/hints)
-                            st.session_state.challenge_questions = [
-                                q.strip() for q in questions_raw
-                                if q.strip() and not q.strip().startswith("(")
-                            ]
+                                st.session_state.challenge_questions = [
+                                    q.strip() for q in questions_text.split("\n")
+                                    if q.strip() and not q.strip().startswith(("Here are", "("))
+                                ]
                         else:
                             st.error(f"❌ Failed to generate questions: {res.text}")
                     except Exception as e:
@@ -113,10 +118,7 @@ if st.session_state.uploaded:
                 if user_input.strip():
                     with st.spinner("Evaluating..."):
                         try:
-                            res = requests.post(
-                                f"{BASE_URL}/evaluate",
-                                json={"question": question, "user_answer": user_input}
-                            )
+                            res = requests.post(f"{BASE_URL}/evaluate", json={"question": question, "user_answer": user_input})
                             if res.status_code == 200:
                                 feedback = res.json().get("feedback", "")
                                 context = res.json().get("context_used", "")
